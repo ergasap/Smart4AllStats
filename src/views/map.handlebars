@@ -1,0 +1,158 @@
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-center">
+    <p id="contenedor-mapa" class="mt-3"></p>
+    <div id="contenedor-pais" class="mt-3" style="display: none; border: 1px black solid;"></div>
+    <!--<div id="info-pais" class="col mt-3" style="display: none; border: 1px red solid;"></div>-->
+
+  </div>
+</div>
+
+
+<script type="text/javascript">
+      
+      loadDatosMapa()
+              
+      var jsonMapa
+      var acumulado={}
+
+
+      var width = 1100;
+      var height = 600;
+
+      var projection = d3.geo.mercator()    
+          .center([20, 57])
+          .scale(600)
+          .rotate([0,0])
+
+      var svg = d3.select("p").append("svg")
+          .attr("width", width)
+          .attr("height", height);
+      
+      
+      var path = d3.geo.path()
+          .projection(projection);
+          
+      var g = svg.append("g");
+     
+      var div = d3.select("body").append("div")
+        .style("position", "absolute")
+        .style("text-align", "left")
+        .style("width", "220px")
+        .style("height", "75px")
+        .style("font", "15px sans-serif")
+        .style("color", "black")
+        .style("background", "#e4ecec")
+        .style("opacity", 0.8)
+        .style("padding-top", "5px")
+        .style("padding-left", "5px")
+        .style("display", "none")
+
+      d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json", function(error, topology) {
+        //console.log(topology)
+        g.selectAll("path") 
+          .data(topojson.object(topology, topology.objects.countries).geometries) 
+          .enter() 
+          .append("path")
+            .attr("d", path)
+            .attr("class", "map")
+          .on("mouseover", over)
+          .on("mouseout", out)
+          .on("click", click)   
+      });
+
+          
+      function over(d, i) {
+        let acumulado
+        
+        try{
+          acumulado = jsonMapa[d.properties.name].TotalPartnerShare
+        }catch(e){acumulado = 0}
+        
+        div.html( 
+          "<p><strong>" + d.properties.name + "</strong></p>" +
+          "Total partner share: " + acumulado + " €"
+          )
+          .style("left", (d3.event.pageX + 9 ) + "px")
+          .style("top", (d3.event.pageY - 43) + "px")
+          .style("display", "block")
+      }
+
+      function out(d, i) {
+        div.style("display", "none")
+      }
+
+      function click(d,i){
+        var centroid = path.centroid(d);
+
+        d3.select("#contenedor-mapa")
+          .style("display", "none")
+
+        d3.select("#contenedor-pais")
+            .style("display", "block")
+                
+        d3.select("#info-pais")
+            .style("display", "block")
+
+        var widthCountry = 800
+        var heightCountry = 600
+
+        var projectionCountry = d3.geo.mercator()    
+          .center([30, 50])
+          .scale(400)
+          .rotate([0,0])
+
+        var svgCountry = d3.select("#contenedor-pais").append("svg")
+          .attr("width", widthCountry)
+          .attr("height", heightCountry);
+
+        d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json", function(error, data){
+
+            // Filter data
+            data.objects.countries.geometries = data.objects.countries.geometries.filter(
+              function(d2){
+                return d2.properties.name==d.properties.name
+            })
+
+           /* console.log(data.objects.countries.geometries)
+            console.log("--------")
+            console.log(data) */
+
+            // Draw the map
+            svgCountry
+            .append("g")
+                .selectAll("path")
+                .data(topojson.object(data, data.objects.countries).geometries)
+                .enter()
+                .append("path")
+                  .attr("fill", "grey")
+                  .attr("d", d3.geo.path().projection(projectionCountry))
+                  .attr("transform", function(d) {
+                    let coords = path.centroid(d.geometry);
+                    console.log(coords)
+                    //return `translate(${coords[0]}, ${coords[1]})`
+                  })
+                  .style("stroke", "none")
+        })
+        
+        /*console.log(centroid)
+        var coordinates = projection([centroid[0], centroid[1]])
+        console.log(coordinates)
+        svgCountry.attr("transform", "translate(" + (-coordinates[0]) + "," + (-coordinates[1]) + ")")*/
+
+      }
+
+      function loadDatosMapa(){
+        fetch('/datos-map', {method: 'GET'})
+          .then(res =>  res.json())
+          .then(data => 
+            jsonMapa = data
+          )
+          .catch(e => {
+            console.log(e);
+          });
+      }
+
+    
+      
+</script>

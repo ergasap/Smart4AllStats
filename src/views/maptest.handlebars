@@ -1,0 +1,206 @@
+<!-- Styles -->
+<style>
+    #chartdiv {
+        width: 75%;
+        height: 600px;
+    }
+    
+    #container-country{
+        display: none; 
+        
+    }
+
+</style>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+<!-- Chart code -->
+<script>
+
+    var jsonMapa
+    var polygonSeries
+    var jsonDatosPais
+    var chart
+
+    async function main() {
+        //Cargar datos del mapa
+        async function loadDatosMapa() {
+            const res = await fetch('/datos-map', { method: 'GET' })
+            const data = await res.json()
+            jsonMapa = data
+
+        }
+        await loadDatosMapa()
+
+        //Crear mapa
+        am5.ready(function () {
+
+            var root = am5.Root.new("chartdiv");
+
+            root.setThemes([
+                am5themes_Animated.new(root)
+            ]);
+
+            chart = root.container.children.push(am5map.MapChart.new(root, {
+                panX: "translateX",
+                panY: "translateY",
+                projection: am5map.geoMercator()
+            }));    
+            
+            //chart.zoomToGeoPoint({ longitude: 10, latitude: 52 }, 3.5);
+
+            jsonMapa.countriesDelete.push("CD")
+
+            polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+                geoJSON: am5geodata_worldLow,
+                exclude: jsonMapa.countriesDelete
+            }));
+
+            let arrayComplete = [];
+                
+            for(const [key, value] of Object.entries(jsonMapa.countries)){
+                
+                let obj = {
+                    "id": value.id,
+                    "totalpartnershare": value.TotalPartnerShare
+                }
+                    
+                arrayComplete.push(obj);
+            }
+            
+            setTimeout(()=>{polygonSeries.data.setAll(arrayComplete)}, 2000)
+            //setTimeout(()=>{console.log(polygonSeries)}, 6000)
+            /*setTimeout(()=>{
+                polygonSeries._data._values.forEach((polygon) => {
+                    if(polygon.id == 'ES'){console.log(polygon)}
+                })
+            }, 6000)*/
+
+
+            polygonSeries.mapPolygons.template.setAll({
+                tooltipText: "{name}\n" +
+                    "Total Partner Share: {totalpartnershare}",
+                toggleKey: "active",
+                interactive: true
+            });
+
+            polygonSeries.mapPolygons.template.events.on("click", function(obj) {
+                    //console.log(obj)
+                    /*let containerData = document.getElementById("data-country")
+                    containerData.style.display="block"
+                    setDatosContenedor(target.dataItem.dataContext.name)*/
+            })
+
+            polygonSeries.mapPolygons.template.states.create("hover", {
+                fill: root.interfaceColors.get("primaryButtonHover")
+            });
+
+            polygonSeries.mapPolygons.template.states.create("active", {
+                fill: root.interfaceColors.get("primaryButtonHover")
+            });
+
+            var previousPolygon;
+
+            polygonSeries.mapPolygons.template.on("active", function (active, target) {
+                
+
+                if (previousPolygon && previousPolygon != target) {
+                    previousPolygon.set("active", false);
+                }
+                if (target.get("active")) {
+                    polygonSeries.zoomToDataItem(target.dataItem );
+                    let nombrePais = target._dataItem.dataContext.name
+                    if(nombrePais == "Spain") console.log("Somos iguales")
+                    let containerData = document.getElementById("container-country")
+                    containerData.style.display="block"
+                    setDatosContenedor(nombrePais)
+                    //containerData.scrollIntoView() 
+                }
+                else {
+                    chart.goHome();
+                }
+                previousPolygon = target;
+            });
+
+            chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
+
+            chart.chartContainer.get("background").events.on("click", function (obj) {
+                chart.goHome();
+            })
+
+            chart.appear(200, 200);
+        })
+
+        async function setDatosContenedor(nombrePais){
+
+            await loadDatosContenedor(nombrePais)
+            let div = document.getElementById("data-country")
+            let html = " "
+
+            if(jsonDatosPais.projects.length == 0){
+                html+=`
+                    <li class="list-group-item d-flex justify-content-center align-items-center"> 
+                        <div class="fw-bold"> No existing projects for this country...</div>
+                    </li>`
+            }else{
+                jsonDatosPais.projects.forEach(project => {
+                html+=
+                    `<ul class=" list-group list-group-flush justify-content-center">
+                        <li class="list-group-item d-flex justify-content-between align-items-center"> 
+                            <div class="fw-bold"> Project name: </div>
+                            <span class="fw-bold"> ${project.NombreProyecto} </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center"> 
+                            <div> Country name: </div>
+                            <span class=""> ${project.Pais}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center"> 
+                            <div> Country share: </div>
+                            <span class=""> ${project.Dinero} €</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center"> 
+                            <div> Entity name: </div>
+                            <span class=""> ${project.Entidad}</span>
+                        </li>
+                    </ul>`
+                })
+            }
+
+            div.innerHTML = html
+        }
+
+        async function loadDatosContenedor(nombrePais){
+            console.log(nombrePais)
+            let fetchText = `/datos-country/${nombrePais}`
+            const res = await fetch(fetchText, { method: 'GET' })
+            const data = await res.json()
+            jsonDatosPais = data
+        }
+    }
+    main()
+
+</script>
+
+<div class="container-fluid">
+    <div class="container-sm">
+            <div class="row">
+        <div class="d-flex justify-content-center">
+            <div id="chartdiv"></div>
+        </div>
+    </div>
+        <div id="container-country" class="mt-4 mb-4">
+            <ul id="data-country" class=" list-group list-group-flush justify-content-center gap-4">
+
+            </ul>
+        </div>
+    </div>
+    </div>
+  
+</div>
+
+
+

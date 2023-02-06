@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=ABeeZee">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <!-- <link rel="stylesheet" href="styles.css" /> -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="http://d3js.org/topojson.v0.min.js"></script>
+
+    <style>
+
+      path {
+        stroke: white;
+        stroke-width: 0.5px;
+        fill: #9cacb4;
+      }
+
+      .map:hover{
+        fill: #648397;
+      }
+      
+      body{
+        background-color: rgba(255, 255, 255, 0.89);
+        background-image: url(https://smart4all-project.eu/wp-content/uploads/2020/03/plegma.png);
+        background-position: center center;
+        background-position-x: center;
+        background-position-y: center;
+        background-repeat: repeat;
+        background-repeat-x: repeat;
+        background-repeat-y: repeat;
+        background-size: 130% auto;
+        opacity: 0.8;
+        transition: background 0.3s, border-radius 0.3s, opacity 0.3s;
+      }
+
+      .nav-link-edit{
+        color: black !important;
+        background: rgba(255, 255, 255, 0.5) !important;
+      }
+
+      .home-lettering{
+        font-family: "ABeeZee", Sans-serif;
+        font-style: italic;
+        font-size: 2.2666666666667rem;
+        text-align: center;
+      }
+
+      .header-nav-link{
+        font-weight: 600; 
+        font-size: large;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+    </style>
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v0.min.js"></script>
+
+    {{> header}}
+    {{{ body }}}
+    {{> footer}} 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+</body>
+</html>
