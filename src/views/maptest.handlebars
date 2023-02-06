@@ -178,6 +178,7 @@
             let fetchText = `/datos-country/${nombrePais}`
             const res = await fetch(fetchText, { method: 'GET' })
             const data = await res.json()
+            console.log(data)
             jsonDatosPais = data
         }
     }

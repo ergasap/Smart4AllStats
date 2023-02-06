@@ -55,9 +55,9 @@ export default function datosCountry(req, res){
             
             jsonProjects.projects.push(jsonAux)
 
-            continue
-
-        }else if(countryName == country2){
+        }
+        
+        if(countryName == country2){
 
             let jsonAux = {
                 "NombreProyecto":"",
@@ -72,10 +72,10 @@ export default function datosCountry(req, res){
             jsonAux.Entidad = entity2
             
             jsonProjects.projects.push(jsonAux)
-            
-            continue
 
-        }else if(country3 != undefined && countryName == country3 ){
+        } 
+        
+        if(country3 != undefined && countryName == country3 ){
             
             let jsonAux = {
                 "NombreProyecto":"",
@@ -90,12 +90,8 @@ export default function datosCountry(req, res){
             jsonAux.Entidad = entity3
             
             jsonProjects.projects.push(jsonAux)
-            
-            continue
 
-        }else{
-            continue
-        }   
+        }  
     }
 
     res.setHeader('Content-type', 'text/json')
