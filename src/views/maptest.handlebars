@@ -1,4 +1,3 @@
-<!-- Styles -->
 <style>
     #chartdiv {
         width: 75%;
@@ -12,13 +11,11 @@
 
 </style>
 
-<!-- Resources -->
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
 
-<!-- Chart code -->
 <script>
 
     var jsonMapa
@@ -45,13 +42,14 @@
                 am5themes_Animated.new(root)
             ]);
 
-            chart = root.container.children.push(am5map.MapChart.new(root, {
+            var chart = root.container.children.push(am5map.MapChart.new(root, {
                 panX: "translateX",
                 panY: "translateY",
+                homeZoomLevel: 3.5,
+                homeGeoPoint: { longitude: 10, latitude: 52 },
                 projection: am5map.geoMercator()
-            }));    
+            }));   
             
-            //chart.zoomToGeoPoint({ longitude: 10, latitude: 52 }, 3.5);
 
             jsonMapa.countriesDelete.push("CD")
 
@@ -72,14 +70,7 @@
                 arrayComplete.push(obj);
             }
             
-            setTimeout(()=>{polygonSeries.data.setAll(arrayComplete)}, 2000)
-            //setTimeout(()=>{console.log(polygonSeries)}, 6000)
-            /*setTimeout(()=>{
-                polygonSeries._data._values.forEach((polygon) => {
-                    if(polygon.id == 'ES'){console.log(polygon)}
-                })
-            }, 6000)*/
-
+            setTimeout(()=>{polygonSeries.data.setAll(arrayComplete)}, 500)
 
             polygonSeries.mapPolygons.template.setAll({
                 tooltipText: "{name}\n" +
@@ -89,10 +80,7 @@
             });
 
             polygonSeries.mapPolygons.template.events.on("click", function(obj) {
-                    //console.log(obj)
-                    /*let containerData = document.getElementById("data-country")
-                    containerData.style.display="block"
-                    setDatosContenedor(target.dataItem.dataContext.name)*/
+
             })
 
             polygonSeries.mapPolygons.template.states.create("hover", {
@@ -118,12 +106,17 @@
                     let containerData = document.getElementById("container-country")
                     containerData.style.display="block"
                     setDatosContenedor(nombrePais)
-                    //containerData.scrollIntoView() 
                 }
                 else {
                     chart.goHome();
                 }
                 previousPolygon = target;
+            });
+
+            let count = 0
+            polygonSeries.events.on("datavalidated", function() {
+                count++
+                if (count==2) chart.goHome() 
             });
 
             chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
@@ -178,7 +171,6 @@
             let fetchText = `/datos-country/${nombrePais}`
             const res = await fetch(fetchText, { method: 'GET' })
             const data = await res.json()
-            console.log(data)
             jsonDatosPais = data
         }
     }
