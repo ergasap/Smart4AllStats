@@ -15,7 +15,7 @@ export default function datosTabla(){
         var jsonSheet = {
             "sheet" : []
         }
-        var filas=1
+        var filas=2
 
         //calcula número de filas de la tabla
         for(let k=2; k<100; k++){
@@ -31,6 +31,7 @@ export default function datosTabla(){
             var jsonAux = {
             "filanueva":[]
             }
+            //recorre cada columna
             for (let index = 0; index < letras.length; index++) {
                 let valor = ""
                 if(worksheet[`${letras[index]}${j}`] == undefined){
@@ -43,6 +44,7 @@ export default function datosTabla(){
             }
             jsonSheet.sheet.push(jsonAux)
         }
+        
         json.sheets.push(jsonSheet)
     }
 

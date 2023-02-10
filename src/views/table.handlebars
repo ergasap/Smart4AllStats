@@ -97,8 +97,6 @@ function loadDatosTablas(){
         data.sheets.forEach((sheet, index)=> {
           let id = "table"+index
           montarTabla(sheet, id)
-          //console.log("Soy la sheet numero " + index + " y esto es lo que voy a enviar ")
-          //console.log(sheet)
           loadJsonDatos(sheet,index)
           numTablas+=1
         })
@@ -164,29 +162,29 @@ function loadJsonDatos(jsonSheet,id){
         
       let jsonAux = {
         "CODE":"",
-        "TRIM1":0,
-        "TRIM2":0,
-        "TRIM3":0,
+        "PERIOD1":0,
+        "PERIOD2":0,
+        "PERIOD3":0,
       }
 
       jsonAux.CODE = entrada.filanueva[2].clave
 
       if(entrada.filanueva[3].clave == "-"){
-        jsonAux.TRIM1 = 0
+        jsonAux.PERIOD1 = 0
       }else{
-        jsonAux.TRIM1 = entrada.filanueva[3].clave
+        jsonAux.PERIOD1 = entrada.filanueva[3].clave
       }
       
       if(entrada.filanueva[4].clave == "-"){
-        jsonAux.TRIM2 = 0
+        jsonAux.PERIOD2 = 0
       }else{
-        jsonAux.TRIM2 = entrada.filanueva[4].clave
+        jsonAux.PERIOD2 = entrada.filanueva[4].clave
       }
 
       if(entrada.filanueva[5].clave == "-"){
-        jsonAux.TRIM3 = 0
+        jsonAux.PERIOD3 = 0
       }else{
-        jsonAux.TRIM3 = entrada.filanueva[5].clave
+        jsonAux.PERIOD3 = entrada.filanueva[5].clave
       }
 
       data2.push(jsonAux) 
@@ -198,27 +196,131 @@ function loadJsonDatos(jsonSheet,id){
 }
 
 
-function loadGraficos(data4, id){
+function loadGraficos(data, id){
+  switch (id) {
+    case 0:
+      createDefaultColumnChart(data, id)
+      break;
+    case 1:
+      createDefaultColumnChart(data, id)
+      break;
+    case 2:
+      createStackedColumnChart(data, id)
+      break;
+    case 3:
+      createDefaultColumnChart(data, id)
+      break;
+    case 4:
+      createDefaultColumnChart(data, id)
+      break;
+    case 5:
+      createDefaultColumnChart(data, id)
+      break;
+    default:
+      console.log("No chart for that id")
+  }
+}
 
-/*var data3 = [{
-        "CODE":"WP2",
-        "TRIM1":100,
-        "TRIM2":500,
-        "TRIM3":50,
-      },{
-        "CODE":"WP3",
-        "TRIM1":500,
-        "TRIM2":1000,
-        "TRIM3":10,
-      },{
-        "CODE":"WP4",
-        "TRIM1":500,
-        "TRIM2":50,
-        "TRIM3":1000,
-}]*/
+function createDefaultColumnChart(data, id){
+  console.log(data)
+  am5.ready(function() {
 
-console.log(data4)
-am5.ready(function() {
+  let chartdiv = "chartdiv"+id
+  var root = am5.Root.new(chartdiv);
+
+  root.setThemes([
+    am5themes_Animated.new(root)
+  ]);
+
+  var chart = root.container.children.push(am5xy.XYChart.new(root, {
+    panX: false,
+    panY: false,
+    wheelX: "panX",
+    wheelY: "zoomX",
+    layout: root.verticalLayout
+  }));
+
+  chart.set("scrollbarX", am5.Scrollbar.new(root, {
+    orientation: "horizontal"
+  })); 
+
+  var legend = chart.children.push(
+    am5.Legend.new(root, {
+      centerX: am5.p50,
+      x: am5.p50
+    })
+  );
+
+  var xRenderer = am5xy.AxisRendererX.new(root, {
+    cellStartLocation: 0.1,
+    cellEndLocation: 0.9
+  })
+
+  var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+    categoryField: "CODE",
+    renderer: xRenderer,
+    tooltip: am5.Tooltip.new(root, {})
+  }));
+
+  xRenderer.grid.template.setAll({
+    location: 1
+  })
+
+  xAxis.data.setAll(data);
+
+  var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+    renderer: am5xy.AxisRendererY.new(root, {
+      strokeOpacity: 0.1
+    })
+  }));
+
+  function makeSeries(name, fieldName) {
+    var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+      name: name,
+      xAxis: xAxis,
+      yAxis: yAxis,
+      valueYField: fieldName,
+      categoryXField: "CODE"
+    }));
+
+    series.columns.template.setAll({
+      tooltipText: "{name}, {categoryX}: {valueY}",
+      width: am5.percent(90),
+      tooltipY: 0,
+      strokeOpacity: 0
+    });
+
+    series.data.setAll(data);
+
+    series.appear();
+
+    series.bullets.push(function() {
+      return am5.Bullet.new(root, {
+        locationY: 0,
+        sprite: am5.Label.new(root, {
+          text: "{valueY}",
+          fill: root.interfaceColors.get("alternativeText"),
+          centerY: 0,
+          centerX: am5.p50,
+          populateText: true
+        })
+      });
+    });
+
+    legend.data.push(series);
+  }
+
+  makeSeries("1º Period", "PERIOD1");
+  makeSeries("2º Period", "PERIOD2");
+  makeSeries("3º Period", "PERIOD3");
+
+  chart.appear(1000, 100);
+
+  }); 
+}
+
+function createStackedColumnChart(data, id){
+  am5.ready(function() {
 
   let chartdiv = "chartdiv"+id
   var root = am5.Root.new(chartdiv);
@@ -245,7 +347,7 @@ am5.ready(function() {
     tooltip: am5.Tooltip.new(root, {})
   }));
 
-  xAxis.data.setAll(data4);
+  xAxis.data.setAll(data);
 
   var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
     min: 0,
@@ -271,7 +373,7 @@ am5.ready(function() {
       tooltipText: "{name}, {categoryX}: {valueY}",
       tooltipY: am5.percent(10)
     });
-    series.data.setAll(data4);
+    series.data.setAll(data);
 
     series.appear();
 
@@ -290,9 +392,9 @@ am5.ready(function() {
     legend.data.push(series);
   }
 
-  makeSeries("1ºTRIM", "TRIM1");
-  makeSeries("2ºTRIM", "TRIM2");
-  makeSeries("3ºTRIM", "TRIM3");
+  makeSeries("1º Period", "PERIOD1");
+  makeSeries("2º Period", "PERIOD2");
+  makeSeries("3º Period", "PERIOD3");
 
   chart.appear(1000, 100);
 
