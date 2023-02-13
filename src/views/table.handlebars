@@ -3,6 +3,13 @@
     width: 100%;
     height: 500px;
   }
+
+  .piediv {
+    width: 100%;
+    height: 500px;
+    padding-left: 50px;
+    padding-right: 50px;
+  }
 </style>
 
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
@@ -77,15 +84,31 @@
   <div class="row" id="piediv" style="display: none;">
     <ul class="nav nav-tabs border-bottom-0">
       <li class="nav-item">
-        <a class="nav-link active nav-link-edit" href="#" onclick="enablePieChart(0)" id="pietab0" >Participation per vertical</a>
+        <a class="nav-link active nav-link-edit" onclick="enablePieChart(0)" id="pietab0" >Participation per vertical</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link nav-link-edit" href="#" onclick="enablePieChart(1)" id="pietab1">Participation per profile</a>
+        <a class="nav-link nav-link-edit" onclick="enablePieChart(3)" id="pietab3">Participation per profile</a>
       </li>
     </ul>
-    <div class="row">
-      <div id="piechartdiv0" class="chartdiv" style="display: none;"></div>
-      <div id="piechartdiv1" class="chartdiv" style="display: none;"></div>
+    <div class="row row-cols-3">
+      <div class="col">
+        <div id="piechartdiv0" class="piediv"></div>
+      </div>
+      <div class="col">
+        <div id="piechartdiv1" class="piediv"></div>
+      </div>
+      <div class="col">
+        <div id="piechartdiv2" class="piediv"></div>
+      </div>
+      <div class="col">
+        <div id="piechartdiv3" class="piediv" style="display: none;"></div>
+      </div>
+      <div class="col">
+        <div id="piechartdiv4" class="piediv" style="display: none;"></div>
+      </div>
+      <div class="col">
+        <div id="piechartdiv5" class="piediv" style="display: none;"></div>
+      </div>
     </div>
   </div>
   <div class="row row-cols-2">
@@ -101,9 +124,11 @@
 <script>
 
 var numTablas = 0;
+var pieData;
+
 function main(){
   loadDatosTablas()
-  //loadDatosPie()
+  loadDatosPie()
 }
 
 function loadDatosTablas(){
@@ -413,54 +438,56 @@ function createStackedColumnChart(data, id){
 
 //Pie chart logic
 function enablePieChart(id){
-  let id2; 
-  id==0 ? id2 = 1 : id2 = 0;
+  let id2;
+  id == 0 ? id2 = 3 : id2 = 0
   disableRestPieChart(id2)
   var idPieTab = "pietab"+id
-  var idPieChart = "piechartdiv"+id
   var tab = document.getElementById(idPieTab).classList.add("active")
-  var chart = document.getElementById(idPieChart).style.display="block"
+  let limit = id +3
+  for (let i=id; i<limit; i++){
+    var idPieChart = "piechartdiv"+i
+    var chart = document.getElementById(idPieChart).style.display="block"
+  }
 }
 
-function disableRestPieChart(id){ 
-  var idPieTab = "pietab"+ id
-  var idPieChart = "piechartdiv"+ id
+function disableRestPieChart(id){
+  var idPieTab = "pietab"+id
   var tab = document.getElementById(idPieTab).classList.remove("active")
-  var graph = document.getElementById(idPieChart).style.display="none"
+  let limit = id + 3
+  for (let i=id; i<limit; i++){
+    var idPieChart = "piechartdiv"+i
+    var chart = document.getElementById(idPieChart).style.display="none"
+  }
 }
 
 async function loadDatosPie(){
     await fetch('/datos-pie', {method: 'GET'})
     .then(res =>  res.json())
     .then(data =>{
-       //datos tienen que venir como un array de jsons donde cada json tiene category y value 
+       pieData = data
     })
     .catch(e => {
       console.log(e);
     });
 
-  createPieChart(data, 0)
-  createPieChart(data, 1)
+  pieData.forEach((e, index) =>{
+    createPieChart(e,index)
+  })
 }
 
 
 function createPieChart(data,id){
-  
   am5.ready(function() {
-
   let piechartdiv = "piechartdiv"+id
   var root = am5.Root.new(piechartdiv);
-
   root.setThemes([
     am5themes_Animated.new(root)
   ]);
-
   var chart = root.container.children.push(
     am5percent.PieChart.new(root, {
       endAngle: 270
     })
   );
-
   var series = chart.series.push(
     am5percent.PieSeries.new(root, {
       valueField: "value",
@@ -468,36 +495,11 @@ function createPieChart(data,id){
       endAngle: 270
     })
   );
-
   series.states.create("hidden", {
     endAngle: -90
   });
-
-  series.data.setAll([{
-    category: "Lithuania",
-    value: 501.9
-  }, {
-    category: "Czechia",
-    value: 301.9
-  }, {
-    category: "Ireland",
-    value: 201.1
-  }, {
-    category: "Germany",
-    value: 165.8
-  }, {
-    category: "Australia",
-    value: 139.9
-  }, {
-    category: "Austria",
-    value: 128.3
-  }, {
-    category: "UK",
-    value: 99
-  }]);
-
+  series.data.setAll(data);
   series.appear(1000, 100);
-
   });
 }
 

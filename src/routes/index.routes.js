@@ -3,7 +3,7 @@ const router = express.Router()
 
 import datosMapa from '../services/overview.js'
 import datosTabla from '../services/kpi.js'
-import datosPie from '../services/kpi.js'
+import datosPie from '../services/pieData.js'
 import datosCountry from '../services/mapData.js'
 
 
@@ -33,7 +33,7 @@ router.get('/datos-map', function (req, res) {
 
 router.get('/datos-pie', function (req, res) {
     res.setHeader('Content-type', 'text/json')
-    var jsonPie = datosPie() //implementar funcion
+    var jsonPie = datosPie() 
 	res.send(jsonPie)
 })
 
