@@ -36,7 +36,6 @@
 
         //Crear mapa
         am5.ready(function () {
-
             var root = am5.Root.new("chartdiv");
 
             root.setThemes([
@@ -50,14 +49,27 @@
                 homeGeoPoint: { longitude: 14, latitude: 52 },
                 projection: am5map.geoMercator()
             }));   
-            
-
+        
             jsonMapa.countriesDelete.push("CD")
 
             polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
                 geoJSON: am5geodata_worldLow,
-                exclude: jsonMapa.countriesDelete
+                exclude: jsonMapa.countriesDelete,
+                valueField: "value",
+                calculateAggregates: true
             }));
+
+            polygonSeries.set("heatRules", [{
+                target: polygonSeries.mapPolygons.template,
+                dataField: "value",
+                min: am5.color(0x85ff8b), 
+                max: am5.color(0xff4a4a),
+                key: "fill"
+            }]);
+
+            polygonSeries.mapPolygons.template.events.on("pointerover", function(ev) {
+                heatLegend.showValue(ev.target.dataItem.get("value"));
+            });
 
             let arrayComplete = [];
 
@@ -65,14 +77,12 @@
                 for(const [key, value] of Object.entries(jsonMapa.countries)){
                 
                 let arrayProjects = await loadNumberOfProjects(value.Nombre)
-                
-                
                 let obj = {
                     "id": value.id,
                     "totalpartnershare": value.TotalPartnerShare,
-                    "numberprojects": arrayProjects.projects.length
+                    "numberprojects": arrayProjects.projects.length,
+                    "value": arrayProjects.projects.length
                 }
-
                 arrayComplete.push(obj);
             }
             })()
@@ -87,10 +97,6 @@
                 interactive: true
             });
 
-            polygonSeries.mapPolygons.template.events.on("click", function(obj) {
-
-            })
-
             polygonSeries.mapPolygons.template.states.create("hover", {
                 fill: root.interfaceColors.get("primaryButtonHover")
             });
@@ -102,7 +108,6 @@
             var previousPolygon;
 
             polygonSeries.mapPolygons.template.on("active", function (active, target) {
-                
 
                 if (previousPolygon && previousPolygon != target) {
                     previousPolygon.set("active", false);
@@ -121,10 +126,33 @@
                 previousPolygon = target;
             });
 
+            var heatLegend = chart.children.push(am5.HeatLegend.new(root, {
+                orientation: "vertical",
+                startColor: am5.color(0x85ff8b), 
+                endColor: am5.color(0xff4a4a), 
+                startText: "Lowest",
+                endText: "Highest",
+                stepCount: 5
+            }));
+
+            heatLegend.startLabel.setAll({
+                fontSize: 12,
+                fill: heatLegend.get("startColor")
+            });
+
+            heatLegend.endLabel.setAll({
+                fontSize: 12,
+                fill: heatLegend.get("endColor")
+            });
+
             let count = 0
             polygonSeries.events.on("datavalidated", function() {
                 count++
-                if (count==2) chart.goHome() 
+                if (count==2){ 
+                    chart.goHome()
+                    heatLegend.set("startValue", polygonSeries.getPrivate("valueLow"));
+                    heatLegend.set("endValue", polygonSeries.getPrivate("valueHigh")); 
+                }
             });
 
             chart.set("zoomControl", am5map.ZoomControl.new(root, {}));

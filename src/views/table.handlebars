@@ -8,6 +8,8 @@
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+<script src="//cdn.amcharts.com/lib/5/themes/Material.js"></script>
 
 <div class="container-fluid">
 
@@ -72,6 +74,20 @@
       <div id="chartdiv4" class="chartdiv" style="display: none;"></div> 
     </div>
   </div>
+  <div class="row" id="piediv" style="display: none;">
+    <ul class="nav nav-tabs border-bottom-0">
+      <li class="nav-item">
+        <a class="nav-link active nav-link-edit" href="#" onclick="enablePieChart(0)" id="pietab0" >Participation per vertical</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link nav-link-edit" href="#" onclick="enablePieChart(1)" id="pietab1">Participation per profile</a>
+      </li>
+    </ul>
+    <div class="row">
+      <div id="piechartdiv0" class="chartdiv" style="display: none;"></div>
+      <div id="piechartdiv1" class="chartdiv" style="display: none;"></div>
+    </div>
+  </div>
   <div class="row row-cols-2">
     <div class="col">
        <table class="table" id="table5" style="display: none;"></table>
@@ -84,11 +100,11 @@
 
 <script>
 
-loadDatosTablas()
-
-
 var numTablas = 0;
-
+function main(){
+  loadDatosTablas()
+  //loadDatosPie()
+}
 
 function loadDatosTablas(){
     fetch('/datos-table', {method: 'GET'})
@@ -137,6 +153,7 @@ function enable(id){
   var tabla = document.getElementById(idTabla).style.display="block"
   var tab = document.getElementById(idTab).classList.add("active")
   var graph = document.getElementById(idGraph).style.display="block"
+  if(id == 4) document.getElementById("piediv").style.display="block"
 
 }
 
@@ -148,16 +165,17 @@ function disableRest(){
     var tabla = document.getElementById(idTabla).style.display="none"
     var tab = document.getElementById(idTab).classList.remove("active")
     var graph = document.getElementById(idGraph).style.display="none"
+    if(i == 4) document.getElementById("piediv").style.display="none"
   } 
   
 }
 
 function loadJsonDatos(jsonSheet,id){
-  let data2=[]
+  let data=[]
 
   jsonSheet.sheet.forEach((entrada, index)=>{
     if(index == 0){
-      
+      	
     }else{
         
       let jsonAux = {
@@ -187,33 +205,25 @@ function loadJsonDatos(jsonSheet,id){
         jsonAux.PERIOD3 = entrada.filanueva[5].clave
       }
 
-      data2.push(jsonAux) 
+      data.push(jsonAux) 
       
     }
 
   })
-    loadGraficos(data2, id)
+    loadGraficos(data, id)
 }
 
 
 function loadGraficos(data, id){
   switch (id) {
     case 0:
-      createDefaultColumnChart(data, id)
-      break;
     case 1:
-      createDefaultColumnChart(data, id)
-      break;
     case 2:
-      createStackedColumnChart(data, id)
-      break;
     case 3:
+    case 5:
       createDefaultColumnChart(data, id)
       break;
     case 4:
-      createDefaultColumnChart(data, id)
-      break;
-    case 5:
       createDefaultColumnChart(data, id)
       break;
     default:
@@ -222,7 +232,6 @@ function loadGraficos(data, id){
 }
 
 function createDefaultColumnChart(data, id){
-  console.log(data)
   am5.ready(function() {
 
   let chartdiv = "chartdiv"+id
@@ -326,7 +335,8 @@ function createStackedColumnChart(data, id){
   var root = am5.Root.new(chartdiv);
 
   root.setThemes([
-    am5themes_Animated.new(root)
+    am5themes_Animated.new(root),
+    am5themes_Material.new(root)
   ]);
 
   var chart = root.container.children.push(am5xy.XYChart.new(root, {
@@ -401,4 +411,95 @@ function createStackedColumnChart(data, id){
 });
 }
 
+//Pie chart logic
+function enablePieChart(id){
+  let id2; 
+  id==0 ? id2 = 1 : id2 = 0;
+  disableRestPieChart(id2)
+  var idPieTab = "pietab"+id
+  var idPieChart = "piechartdiv"+id
+  var tab = document.getElementById(idPieTab).classList.add("active")
+  var chart = document.getElementById(idPieChart).style.display="block"
+}
+
+function disableRestPieChart(id){ 
+  var idPieTab = "pietab"+ id
+  var idPieChart = "piechartdiv"+ id
+  var tab = document.getElementById(idPieTab).classList.remove("active")
+  var graph = document.getElementById(idPieChart).style.display="none"
+}
+
+async function loadDatosPie(){
+    await fetch('/datos-pie', {method: 'GET'})
+    .then(res =>  res.json())
+    .then(data =>{
+       //datos tienen que venir como un array de jsons donde cada json tiene category y value 
+    })
+    .catch(e => {
+      console.log(e);
+    });
+
+  createPieChart(data, 0)
+  createPieChart(data, 1)
+}
+
+
+function createPieChart(data,id){
+  
+  am5.ready(function() {
+
+  let piechartdiv = "piechartdiv"+id
+  var root = am5.Root.new(piechartdiv);
+
+  root.setThemes([
+    am5themes_Animated.new(root)
+  ]);
+
+  var chart = root.container.children.push(
+    am5percent.PieChart.new(root, {
+      endAngle: 270
+    })
+  );
+
+  var series = chart.series.push(
+    am5percent.PieSeries.new(root, {
+      valueField: "value",
+      categoryField: "category",
+      endAngle: 270
+    })
+  );
+
+  series.states.create("hidden", {
+    endAngle: -90
+  });
+
+  series.data.setAll([{
+    category: "Lithuania",
+    value: 501.9
+  }, {
+    category: "Czechia",
+    value: 301.9
+  }, {
+    category: "Ireland",
+    value: 201.1
+  }, {
+    category: "Germany",
+    value: 165.8
+  }, {
+    category: "Australia",
+    value: 139.9
+  }, {
+    category: "Austria",
+    value: 128.3
+  }, {
+    category: "UK",
+    value: 99
+  }]);
+
+  series.appear(1000, 100);
+
+  });
+}
+
+main()
 </script>
