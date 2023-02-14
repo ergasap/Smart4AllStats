@@ -22,7 +22,7 @@ router.get('/datos-table', function (req, res) {
 })
 
 router.get('/map', function (req, res) {
-     res.render('maptest')
+     res.render('map')
 })
 
 router.get('/datos-map', function (req, res) {
