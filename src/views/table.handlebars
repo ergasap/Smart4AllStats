@@ -150,19 +150,36 @@ function loadDatosTablas(){
 function montarTabla(json, idTabla){
  let html = ''
  json.sheet.forEach( (element, index) => {
- if(index == 0){
+ if(idTabla == "table4"){
+   if(index == 0){
+    html+= `<thead><tr>`
+    element.filanueva.forEach((clave) => {
+      html+=`<th>${clave.clave}</th>`
+    })
+    html+= `</thead></tr>`
+  }else{
+      html+= `<tbody><tr>`
+      element.filanueva.forEach((clave) => {
+        html+=`<td>${typeof clave.clave == "number" ? clave.clave * 100  : clave.clave}</td>`
+      })
+      html+= `</tbody></tr>`
+  }
+ }else{
+   if(index == 0){
     html+= `<thead><tr>`
     element.filanueva.forEach((clave) => {
     html+=`<th>${clave.clave}</th>`
     })
       html+= `</thead></tr>`
-    }else{
+  }else{
       html+= `<tbody><tr>`
       element.filanueva.forEach((clave) => {
         html+=`<td>${clave.clave}</td>`
       })
         html+= `</tbody></tr>`
-    }
+  }
+ }
+
 });
 
 var tabla = document.getElementById(idTabla)
@@ -255,7 +272,6 @@ function setMaxThreshold(data){
   }))
 
 }
-
 
 function loadGraficos(data, id){
   switch (id) {
@@ -365,11 +381,11 @@ function createDefaultColumnChart(data, id){
         name: "Threshold",
         xAxis: xAxis,
         yAxis: yAxis,
-        valueYField: "MAXTHRESHOLD",
+        valueYField: "THRESHOLD",
         categoryXField: "CODE",
         tooltip: am5.Tooltip.new(root, {
           pointerOrientation: "horizontal",
-          labelText: "{name} in {categoryX}: {valueY} {info}"
+          labelText: "{name} in {categoryX}: {valueY}"
         })
       })
     );
@@ -378,7 +394,6 @@ function createDefaultColumnChart(data, id){
       strokeWidth: 3,
       templateField: "strokeSettings"
     });
-
 
     series2.data.setAll(data);
 
@@ -433,6 +448,7 @@ function createDefaultColumnChart(data, id){
   //   series3.appear();
   //   }
   }
+  chart.set("cursor", am5xy.XYCursor.new(root, {}));
 
   makeSeries("1º Period", "PERIOD1");
   makeSeries("2º Period", "PERIOD2");
@@ -575,19 +591,26 @@ function createPieChart(data,id){
   ]);
   var chart = root.container.children.push(
     am5percent.PieChart.new(root, {
-      endAngle: 270
+      layout: root.verticalLayout,
+      // endAngle: 270
     })
   );
   var series = chart.series.push(
     am5percent.PieSeries.new(root, {
       valueField: "value",
       categoryField: "category",
-      endAngle: 270
+      alignLabels: false
+      // endAngle: 270
     })
   );
-  series.states.create("hidden", {
-    endAngle: -90
+  series.labels.template.setAll({
+    textType: "circular",
+    centerX: 0,
+    centerY: 0
   });
+  // series.states.create("hidden", {
+  //   endAngle: -90
+  // });
   series.data.setAll(data);
   series.appear(1000, 100);
   });
