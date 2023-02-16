@@ -1,12 +1,11 @@
 <style>
-    #chartdiv {
-        width: 75%;
+    .chartdiv {
+        width: 85%;
         height: 600px;
     }
     
     #container-country{
-        display: none; 
-        
+        display: none;   
     }
 
 </style>
@@ -19,10 +18,12 @@
 <script>
 
     var jsonMapa
-    var polygonSeries
     var jsonDatosPais
-    var chart
     var jsonDatosPaisProjects
+    var flagHeat
+    var rule = true
+    var id = 0
+    var id2 = 1
 
     async function main() {
         //Cargar datos del mapa
@@ -36,15 +37,14 @@
 
         //Crear mapa
         am5.ready(function () {
-            var root = am5.Root.new("chartdiv");
+            let chartdiv = "chartdiv"+id
+            var root = am5.Root.new(chartdiv);
 
             root.setThemes([
                 am5themes_Animated.new(root)
             ]);
 
             var chart = root.container.children.push(am5map.MapChart.new(root, {
-                panX: "translateX",
-                panY: "translateY",
                 homeZoomLevel: 3.5,
                 homeGeoPoint: { longitude: 14, latitude: 52 },
                 projection: am5map.geoMercator()
@@ -52,7 +52,7 @@
         
             jsonMapa.countriesDelete.push("CD")
 
-            polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+            var polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
                 geoJSON: am5geodata_worldLow,
                 exclude: jsonMapa.countriesDelete,
                 valueField: "value",
@@ -73,20 +73,36 @@
 
             let arrayComplete = [];
 
-            (async () =>  { 
-                for(const [key, value] of Object.entries(jsonMapa.countries)){
-                
-                let arrayProjects = await loadNumberOfProjects(value.Nombre)
-                let obj = {
-                    "id": value.id,
-                    "totalpartnershare": value.TotalPartnerShare,
-                    "numberprojects": arrayProjects.projects.length,
-                    "value": arrayProjects.projects.length
+            if(rule){
+                (async () =>  { 
+                    for(const [key, value] of Object.entries(jsonMapa.countries)){
+                    
+                    let arrayProjects = await loadNumberOfProjects(value.Nombre)
+                    let obj = {
+                        "id": value.id,
+                        "totalpartnershare": value.TotalPartnerShare,
+                        "numberprojects": arrayProjects.projects.length,
+                        "value": arrayProjects.projects.length
+                    }
+                    arrayComplete.push(obj);
                 }
-                arrayComplete.push(obj);
+                })()
+            }else{
+                (async () =>  { 
+                    for(const [key, value] of Object.entries(jsonMapa.countries)){
+                    
+                    let arrayProjects = await loadNumberOfProjects(value.Nombre)
+                    let obj = {
+                        "id": value.id,
+                        "totalpartnershare": value.TotalPartnerShare,
+                        "numberprojects": arrayProjects.projects.length,
+                        "value": value.TotalPartnerShare
+                    }
+                    arrayComplete.push(obj);
+                }
+                })()
             }
-            })()
-            
+
             setTimeout(()=>{polygonSeries.data.setAll(arrayComplete)}, 1000)
 
             polygonSeries.mapPolygons.template.setAll({
@@ -155,10 +171,11 @@
                 }
             });
 
-            chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
-
             chart.chartContainer.get("background").events.on("click", function (obj) {
                 chart.goHome();
+                let div = document.getElementById("data-country")
+                let html = ""
+                div.innerHTML = html
             })
 
             chart.appear(200, 200);
@@ -216,23 +233,46 @@
             return data;
         }
     }
-    main()
 
+    function changeHeatRule(flag){
+        rule = flag
+        let map = document.getElementById("chartdiv"+id).style.display="none"
+        let map2 = document.getElementById("chartdiv"+id2).style.display="block"
+        let button = document.getElementById("buttonproject").classList.remove("active")
+        let button2 = document.getElementById("buttonshare").classList.add("active")
+        if (flag){
+            id = 0
+            id2 = 1
+        }else{
+            id = 1
+            id2 = 0
+        }
+        try{main()}catch(e){}
+    }
+
+    try{main()}catch(e){}
 </script>
 
 <div class="container-fluid">
     <div class="container-sm">
-            <div class="row">
-        <div class="d-flex justify-content-center">
-            <div id="chartdiv"></div>
+        <div class="row">
+            <div class="col-2">
+                <button type="button" id="buttonproject" class="btn btn-secondary active" onclick="changeHeatRule(true)">Number of projects</button>
+                <br><br>
+                <button type="button" id="buttonshare" class="btn btn-secondary" onclick="changeHeatRule(false)">Total partner share</button>
+            </div>
+            <div class="col-10">
+                <div class="d-flex justify-content-center">
+                    <div id="chartdiv0" class="chartdiv"></div>
+                    <div id="chartdiv1" class="chartdiv" style="display: none;"></div>
+                </div>
+            </div>
         </div>
-    </div>
         <div id="container-country" class="mt-4 mb-4">
             <ul id="data-country" class=" list-group list-group-flush justify-content-center gap-4">
 
             </ul>
         </div>
-    </div>
     </div>
   
 </div>
