@@ -9,7 +9,7 @@
     }
 
 </style>
-
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
@@ -24,6 +24,7 @@
     var rule = true
     var id = 0
     var id2 = 1
+    var flag2 = false
 
     async function main() {
         //Cargar datos del mapa
@@ -45,7 +46,7 @@
             ]);
 
             var chart = root.container.children.push(am5map.MapChart.new(root, {
-                homeZoomLevel: 3.5,
+                homeZoomLevel: 4,
                 homeGeoPoint: { longitude: 14, latitude: 52 },
                 projection: am5map.geoMercator()
             }));   
@@ -57,7 +58,7 @@
                 exclude: jsonMapa.countriesDelete,
                 valueField: "value",
                 calculateAggregates: true
-            }));
+            }));    
 
             polygonSeries.set("heatRules", [{
                 target: polygonSeries.mapPolygons.template,
@@ -167,7 +168,9 @@
                 if (count==2){ 
                     chart.goHome()
                     heatLegend.set("startValue", polygonSeries.getPrivate("valueLow"));
-                    heatLegend.set("endValue", polygonSeries.getPrivate("valueHigh")); 
+                    heatLegend.set("endValue", polygonSeries.getPrivate("valueHigh"));
+                    setTimeout(()=>{$('#mapcontainer').css('visibility', 'visible');},600)
+                    //$('#mapcontainer').css('visibility', 'visible');
                 }
             });
 
@@ -178,7 +181,7 @@
                 div.innerHTML = html
             })
 
-            chart.appear(200, 200);
+            chart.appear(10, 10);
         })
 
         async function setDatosContenedor(nombrePais){
@@ -240,6 +243,10 @@
         let map2 = document.getElementById("chartdiv"+id2).style.display="block"
         let button = document.getElementById("buttonproject").classList.remove("active")
         let button2 = document.getElementById("buttonshare").classList.add("active")
+        if(!flag2){
+            flag2 = true
+            $('#mapcontainer').css('visibility', 'hidden')
+        }
         if (flag){
             id = 0
             id2 = 1
@@ -262,7 +269,7 @@
                 <button type="button" id="buttonshare" class="btn btn-secondary" onclick="changeHeatRule(false)">Total partner share</button>
             </div>
             <div class="col-10">
-                <div class="d-flex justify-content-center">
+                <div id="mapcontainer" class="d-flex justify-content-center" style="visibility:hidden;">
                     <div id="chartdiv0" class="chartdiv"></div>
                     <div id="chartdiv1" class="chartdiv" style="display: none;"></div>
                 </div>
