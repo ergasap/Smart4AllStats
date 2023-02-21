@@ -45,7 +45,7 @@
       <a class="nav-link nav-link-edit" href="#" onclick="enable(4)" id="tab4">WP6</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link nav-link-edit" href="#" onclick="enable(5)" id="tab5">WP7</a>
+      <a class="nav-link nav-link-edit" href="#" onclick="enable(5)" id="tab5">Task8.8</a>
     </li>
   </ul>
 
@@ -138,10 +138,24 @@
 
 var numTablas = 0;
 var pieData;
+var thresholdData=[]
 
-function main(){
+async function main(){
+  await loadDatosThreshold()
   loadDatosTablas()
   loadDatosPie()
+  
+}
+
+function loadDatosThreshold(){
+    fetch('/thresholds', {method: 'GET'})
+    .then(res =>  res.json())
+    .then(data =>{
+      thresholdData = data
+    })
+    .catch(e => {
+      console.log(e);
+    });
 }
 
 function loadDatosTablas(){
@@ -192,7 +206,6 @@ function montarTabla(json, idTabla){
         html+= `</tbody></tr>`
   }
  }
-
 });
 
 var tabla = document.getElementById(idTabla)
@@ -227,63 +240,45 @@ function disableRest(){
 
 async function loadJsonDatos(jsonSheet,id){
   let data=[]
+  let threshold = thresholdData[id]
 
   jsonSheet.sheet.forEach((entrada, index)=>{
-    if(index == 0){
-      	
-    }else{
-      
-      let jsonAux = {
-        "CODE":"",
-        "PERIOD1":0,
-        "PERIOD2":0,
-        "PERIOD3":0,
-        "THRESHOLD":0,
-        "MAXTHRESHOLD":0
-      }
-      
-      jsonAux.CODE = entrada.filanueva[2].clave
-      jsonAux.THRESHOLD = entrada.filanueva[1].clave
-
-      if(entrada.filanueva[3].clave == "-"){
-        jsonAux.PERIOD1 = 0
+    let i = 0
+      if(index == 0){
+          
       }else{
-        jsonAux.PERIOD1 = entrada.filanueva[3].clave
+        let jsonAux = {
+          "CODE":"",
+          "PERIOD1":0,
+          "PERIOD2":0,
+          "PERIOD3":0,
+          "THRESHOLD":0,
+          "MAXTHRESHOLD":0
+        }
+        
+        jsonAux.CODE = entrada.filanueva[2].clave
+        jsonAux.THRESHOLD = threshold[index-1]
+
+        if(entrada.filanueva[3].clave == "-"){
+          jsonAux.PERIOD1 = 0
+        }else{
+          jsonAux.PERIOD1 = entrada.filanueva[3].clave
+        }
+        
+        if(entrada.filanueva[4].clave == "-"){
+          jsonAux.PERIOD2 = 0
+        }else{
+          jsonAux.PERIOD2 = entrada.filanueva[4].clave
+        }
+        if(entrada.filanueva[5].clave == "-"){
+          jsonAux.PERIOD3 = 0
+        }else{
+          jsonAux.PERIOD3 = entrada.filanueva[5].clave
+        }
+        data.push(jsonAux) 
       }
-      
-      if(entrada.filanueva[4].clave == "-"){
-        jsonAux.PERIOD2 = 0
-      }else{
-        jsonAux.PERIOD2 = entrada.filanueva[4].clave
-      }
-
-      if(entrada.filanueva[5].clave == "-"){
-        jsonAux.PERIOD3 = 0
-      }else{
-        jsonAux.PERIOD3 = entrada.filanueva[5].clave
-      }
-
-      data.push(jsonAux) 
-
-    }
-
   })
-    await setMaxThreshold(data)
     loadGraficos(data, id)
-}
-
-function setMaxThreshold(data){
-  let max = 0
-  data.forEach((e => {
-    if(e.THRESHOLD > max){
-      max = e.THRESHOLD
-    } 
-  }))
-
-  data.forEach((e => {
-    e.MAXTHRESHOLD = max
-  }))
-
 }
 
 function loadGraficos(data, id){
@@ -355,7 +350,7 @@ function createDefaultColumnChart(data, id){
 
   function makeSeries(name, fieldName) {
 
-    if(id==0 || id == 2 || id == 3 || id == 4){
+    //if(id==0 || id == 2 || id == 3 || id == 4){
     var series2 = chart.series.push(am5xy.ColumnSeries.new(root, {
       name: "Threshold",
       xAxis: xAxis,
@@ -375,7 +370,7 @@ function createDefaultColumnChart(data, id){
     series2.appear();
     series2.toBack();
     series2.data.setAll(data);
-  }
+  //}
     var series = chart.series.push(am5xy.ColumnSeries.new(root, {
       name: name,
       xAxis: xAxis,

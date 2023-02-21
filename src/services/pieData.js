@@ -5,8 +5,8 @@ import xlsx from 'xlsx'
     var datos = []
 
     let worksheet = workbook.Sheets[workbook.SheetNames[4]];
-    var valores = ["M", "N", "O"];
-    var categoria = "P";
+    var valores = ["N", "O", "P"];
+    var categoria = "Q";
    
     valores.forEach(e => { 
         var array = []

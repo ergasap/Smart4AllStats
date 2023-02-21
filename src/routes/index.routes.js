@@ -5,6 +5,7 @@ import datosMapa from '../services/overview.js'
 import datosTabla from '../services/kpi.js'
 import datosPie from '../services/pieData.js'
 import datosCountry from '../services/mapData.js'
+import getThresholds from '../services/thresholds.js'
 
 
 router.get('/', function (req, res) {
@@ -38,5 +39,7 @@ router.get('/datos-pie', function (req, res) {
 })
 
 router.get('/datos-country/:name', datosCountry)
+
+router.get('/thresholds', getThresholds)
 
 export default router;
