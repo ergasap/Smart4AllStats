@@ -7,6 +7,9 @@ function countriesDelete(){
         if(country.continent_en != "Europe"){
             jsonCountriesDelete.push(country.code_2)
         }
+        if(country.code_2 == "RU"){
+            jsonCountriesDelete.push(country.code_2)
+        }
     });
 
     return jsonCountriesDelete
