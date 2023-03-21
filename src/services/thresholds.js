@@ -12,12 +12,15 @@ export default async function getThresholds(req,res){
         let filas = await calculaFilas(worksheet)
         let valor
         let json = []
+        let columna;
+        if (i == 0 || i == 2 || i == 3) columna = "B"
+        if (i == 1 || i == 4 || i == 5) columna = "C" 
 
         for(let j=3; j<filas; j++){
-            if(worksheet[`C${j}`] == undefined){
+            if(worksheet[`${columna}${j}`] == undefined){
                 valor = "-"
             }else{
-                valor = worksheet[`C${j}`].v
+                valor = worksheet[`${columna}${j}`].v
             }
             json.push(valor)
         }

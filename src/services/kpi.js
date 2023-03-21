@@ -7,7 +7,7 @@ export default function datosTabla(){
     }
 
     var workbook = xlsx.readFile("src/data/kpis.xlsx")
-    var letras = ["A", "B", "D", "E", "F","G"];
+    var letras = ["A", "B", "D", "E", "F", "G"];
 
     //lectura de datos
     for (let i = 0; i < 6; i++) {
