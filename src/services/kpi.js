@@ -34,6 +34,7 @@ export default function datosTabla(){
             //recorre cada columna
             for (let index = 0; index < letras.length; index++) {
                 let valor = ""
+                if((i == 0 || i==1 || i==2 || i==3 || i==5) && (letras[index] == "F" || letras[index] == "G")) continue;
                 if(worksheet[`${letras[index]}${j}`] == undefined){
                     valor = "-"
                 }else{

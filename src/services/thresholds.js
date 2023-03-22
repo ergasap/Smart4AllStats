@@ -12,9 +12,7 @@ export default async function getThresholds(req,res){
         let filas = await calculaFilas(worksheet)
         let valor
         let json = []
-        let columna;
-        if (i == 0 || i == 2 || i == 3) columna = "B"
-        if (i == 1 || i == 4 || i == 5) columna = "C" 
+        let columna = "C"
 
         for(let j=3; j<filas; j++){
             if(worksheet[`${columna}${j}`] == undefined){

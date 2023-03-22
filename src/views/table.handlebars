@@ -179,93 +179,20 @@ function montarTabla(json, idTabla){
  json.sheet.forEach((element, index) => {
     switch (idTabla) {
       case "table0":
-         if(index == 0){
-            html+= `<thead><tr>`
-            element.filanueva.forEach((clave, id) => {
-              if(id==2 || id==4 || id==5){
-
-              }else{
-                html+=`<th>${clave.clave}</th>`
-              }
-            })
-              html+= `</thead></tr>`
-          }else{
-              html+= `<tbody><tr>`
-              element.filanueva.forEach((clave, id) => {
-                if(id==2 || id==4 || id==5){
-
-                }else{
-                  html+=`<td>${clave.clave}</td>`
-                }
-              })
-              html+= `</tbody></tr>`
-          }
-        break;
       case "table1":
-         if(index == 0){
-            html+= `<thead><tr>`
-            element.filanueva.forEach((clave, id) => {
-              if(id==3 || id==5){
-
-              }else{
-                html+=`<th>${clave.clave}</th>`
-              }
-            })
-              html+= `</thead></tr>`
-          }else{
-              html+= `<tbody><tr>`
-              element.filanueva.forEach((clave, id) => {
-                if(id==3 || id==5){
-
-                }else{
-                  html+=`<td>${clave.clave}</td>`
-                }
-              })
-                html+= `</tbody></tr>`
-          }
-        break;
       case "table2":
-         if(index == 0){
-            html+= `<thead><tr>`
-            element.filanueva.forEach((clave, id) => {
-              if(id==2|| id==4 || id==5){
-
-              }else{
-                html+=`<th>${clave.clave}</th>`
-              }
-            })
-              html+= `</thead></tr>`
-          }else{
-              html+= `<tbody><tr>`
-              element.filanueva.forEach((clave, id) => {
-                if(id==2 || id==4 || id==5){
-
-                }else{
-                  html+=`<td>${clave.clave}</td>`
-                }
-              })
-                html+= `</tbody></tr>`
-          }
-        break;
       case "table3":
+      case "table5":
         if(index == 0){
           html+= `<thead><tr>`
           element.filanueva.forEach((clave, id) => {
-              if(id==2|| id==4 || id==5){
-
-              }else{
                 html+=`<th>${clave.clave}</th>`
-              }
           })
             html+= `</thead></tr>`
         }else{
             html+= `<tbody><tr>`
             element.filanueva.forEach((clave, id) => {
-                if(id==2 || id==4 || id==5){
-
-                }else{
                   html+=`<td>${clave.clave}</td>`
-                }
             })
               html+= `</tbody></tr>`
         }
@@ -280,34 +207,10 @@ function montarTabla(json, idTabla){
         }else{
             html+= `<tbody><tr>`
             element.filanueva.forEach((clave) => {
-              html+=`<td>${typeof clave.clave == "number" ? clave.clave * 100  : clave.clave}</td>`
+              html+=`<td>${typeof clave.clave == "number" ? clave.clave * 100 + "%" : clave.clave}</td>`
             })
             html+= `</tbody></tr>`
         }
-       break;
-
-      case "table5":
-         if(index == 0){
-            html+= `<thead><tr>`
-            element.filanueva.forEach((clave, id) => {
-              if(id==3 || id==5){
-
-              }else{
-                html+=`<th>${clave.clave}</th>`
-              }
-            })
-              html+= `</thead></tr>`
-          }else{
-              html+= `<tbody><tr>`
-              element.filanueva.forEach((clave,id) => {
-                if(id==3 || id==5){
-
-                }else{
-                  html+=`<td>${clave.clave}</td>`
-                }
-              })
-                html+= `</tbody></tr>`
-          }
        break;
     }
 })
@@ -347,7 +250,6 @@ async function loadJsonDatos(jsonSheet,id){
   let threshold = thresholdData[id]
 
   jsonSheet.sheet.forEach((entrada, index)=>{
-    let i = 0
       if(index == 0){
           
       }else{
@@ -360,35 +262,34 @@ async function loadJsonDatos(jsonSheet,id){
           "MAXTHRESHOLD":0,
           "TOTALAMOUNT":0
         }
-        
+
         jsonAux.CODE = entrada.filanueva[2].clave
         jsonAux.THRESHOLD = threshold[index-1]
 
         if(entrada.filanueva[3].clave == "-"){
-          jsonAux.PERIOD1 = 0
+          jsonAux.TOTALAMOUNT = 0
         }else{
-          jsonAux.PERIOD1 = entrada.filanueva[3].clave
-        }
-        
-        if(entrada.filanueva[4].clave == "-"){
-          jsonAux.PERIOD2 = 0
-        }else{
-          jsonAux.PERIOD2 = entrada.filanueva[4].clave
-        }
-        if(entrada.filanueva[5].clave == "-"){
-          jsonAux.PERIOD3 = 0
-        }else{
-          jsonAux.PERIOD3 = entrada.filanueva[5].clave
+          jsonAux.TOTALAMOUNT = Math.round(entrada.filanueva[3].clave / jsonAux.THRESHOLD * 100)
         }
 
-        if(entrada.filanueva[3].clave == "-"){
-          jsonAux.PERIOD1 = 0
-        }else{
-          jsonAux.PERIOD1 = entrada.filanueva[3].clave
+        if(id == 4){
+            jsonAux.THRESHOLD = threshold[index-1] * 100
+            if(entrada.filanueva[3].clave == "-"){
+              jsonAux.PERIOD1 = 0
+            }else{
+              jsonAux.PERIOD1 = entrada.filanueva[3].clave *100
+            }
+            if(entrada.filanueva[4].clave == "-"){
+              jsonAux.PERIOD2 = 0
+            }else{
+              jsonAux.PERIOD2 = entrada.filanueva[4].clave *100
+            }
+            if(entrada.filanueva[5].clave == "-"){
+              jsonAux.PERIOD3 = 0
+            }else{
+              jsonAux.PERIOD3 = entrada.filanueva[5].clave *100
+            }
         }
-        
-        console.log(entrada.filanueva)
-
         data.push(jsonAux) 
       }
   })
@@ -411,6 +312,7 @@ function loadGraficos(data, id){
 }
 
 function createDefaultColumnChart(data, id){
+
   am5.ready(function() {
 
   let chartdiv = "chartdiv"+id
@@ -456,15 +358,23 @@ function createDefaultColumnChart(data, id){
 
   xAxis.data.setAll(data);
 
-  var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-    renderer: am5xy.AxisRendererY.new(root, {
-      strokeOpacity: 0.1
-    })
-  }));
+    var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+      renderer: am5xy.AxisRendererY.new(root, {
+        strokeOpacity: 0.1
+      })
+    }));
+    var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+      min:0,
+      max:100,
+      numberFormat: "#'%'",
+      strictMinMax: true,
+      renderer: am5xy.AxisRendererY.new(root, {
+        strokeOpacity: 0.1
+      })
+    }))
 
   function makeSeries(name, fieldName) {
-
-    //if(id==0 || id == 2 || id == 3 || id == 4){
+  if(id == 4){
     var series2 = chart.series.push(am5xy.ColumnSeries.new(root, {
       name: "Threshold",
       xAxis: xAxis,
@@ -475,16 +385,17 @@ function createDefaultColumnChart(data, id){
     }));
     
     series2.columns.template.setAll({
-      tooltipText: "{name}, {categoryX}: {valueY}",
+      tooltipText: "{name}, {categoryX}: {valueY} %",
       width: am5.percent(100),
       tooltipY: 0,
       strokeOpacity: 0
     });
 
+    series2.set("fill", am5.color("#ffaa21"));
     series2.appear();
     series2.toBack();
     series2.data.setAll(data);
-  //}
+  }
     var series = chart.series.push(am5xy.ColumnSeries.new(root, {
       name: name,
       xAxis: xAxis,
@@ -492,126 +403,34 @@ function createDefaultColumnChart(data, id){
       valueYField: fieldName,
       categoryXField: "CODE"
     }));
+    
+      series.columns.template.setAll({
+        tooltipText: "{name}, {categoryX}: {valueY} %",
+        width: am5.percent(70),
+        tooltipY: 0,
+        strokeOpacity: 0
+      });
+    
 
-    series.columns.template.setAll({
-      tooltipText: "{name}, {categoryX}: {valueY}",
-      width: am5.percent(70),
-      tooltipY: 0,
-      strokeOpacity: 0
-    });
 
     series.data.setAll(data);
-
-    /*series.bullets.push(function() {
-      return am5.Bullet.new(root, {
-        locationY: 0,
-        sprite: am5.Label.new(root, {
-          text: "{valueY}",
-          fill: root.interfaceColors.get("alternativeText"),
-          centerY: 0,
-          centerX: am5.p50,
-          populateText: true
-        })
-      });
-    });*/
-    
     series.appear();
     legend.data.push(series);
   }
+  if(id == 4){
+    makeSeries("1º Period", "PERIOD1");
+    makeSeries("2º Period", "PERIOD2");
+    makeSeries("3º Period", "PERIOD3");
+  }else{
+    makeSeries("Total Amount", "TOTALAMOUNT");
+  }
 
-  //chart.set("cursor", am5xy.XYCursor.new(root, {}));
-
-  makeSeries("1º Period", "PERIOD1");
-  makeSeries("2º Period", "PERIOD2");
-  makeSeries("3º Period", "PERIOD3");
 
   chart.appear(1000, 100);
 
   }); 
 }
-/*
-function createStackedColumnChart(data, id){
-  am5.ready(function() {
 
-  let chartdiv = "chartdiv"+id
-  var root = am5.Root.new(chartdiv);
-
-  root.setThemes([
-    am5themes_Animated.new(root)
-  ]);
-
-  var chart = root.container.children.push(am5xy.XYChart.new(root, {
-    panX: false,
-    panY: false,
-    wheelX: "panX",
-    wheelY: "zoomX",
-    layout: root.verticalLayout
-  }));
-
-  chart.set("scrollbarX", am5.Scrollbar.new(root, {
-    orientation: "horizontal"
-  })); 
-
-  var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
-    categoryField: "CODE",
-    renderer: am5xy.AxisRendererX.new(root, {}),
-    tooltip: am5.Tooltip.new(root, {})
-  }));
-
-  xAxis.data.setAll(data);
-
-  var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-    min: 0,
-    renderer: am5xy.AxisRendererY.new(root, {})
-  }));
-
-  var legend = chart.children.push(am5.Legend.new(root, {
-    centerX: am5.p50,
-    x: am5.p50
-  }));
-
-  function makeSeries(name, fieldName) {
-    var series = chart.series.push(am5xy.ColumnSeries.new(root, {
-      name: name,
-      stacked: true,
-      xAxis: xAxis,
-      yAxis: yAxis,
-      valueYField: fieldName,
-      categoryXField: "CODE"
-    }));
-
-    series.columns.template.setAll({
-      tooltipText: "{name}, {categoryX}: {valueY}",
-      tooltipY: am5.percent(10)
-    });
-    series.data.setAll(data);
-
-    series.appear();
-
-    series.bullets.push(function () {
-      return am5.Bullet.new(root, {
-        sprite: am5.Label.new(root, {
-          text: "{valueY}",
-          fill: root.interfaceColors.get("alternativeText"),
-          centerY: am5.p50,
-          centerX: am5.p50,
-          populateText: true
-        })
-      });
-    });
-
-    legend.data.push(series);
-  }
-
-  makeSeries("1º Period", "PERIOD1");
-  makeSeries("2º Period", "PERIOD2");
-  makeSeries("3º Period", "PERIOD3");
-
-  chart.appear(1000, 100);
-
-});
-}
-*/
 //Pie chart logic
 function enablePieChart(id){
   let id2;
