@@ -163,9 +163,8 @@ function loadDatosTablas(){
     .then(res =>  res.json())
     .then(data =>{
         data.sheets.forEach((sheet, index)=> {
-          let id = "table"+index
-          montarTabla(sheet, id)
-          loadJsonDatos(sheet,index)
+          loadJsonDatos(sheet, index)
+          montarTabla(sheet, index)
           numTablas+=1
         })
     })
@@ -174,8 +173,10 @@ function loadDatosTablas(){
     });
 }
 
-function montarTabla(json, idTabla){
+function montarTabla(json, indexGlobal){
+ let idTabla = "table"+indexGlobal
  let html = ''
+ let threshold = thresholdData[indexGlobal]
  json.sheet.forEach((element, index) => {
     switch (idTabla) {
       case "table0":
@@ -186,13 +187,25 @@ function montarTabla(json, idTabla){
         if(index == 0){
           html+= `<thead><tr>`
           element.filanueva.forEach((clave, id) => {
-                html+=`<th>${clave.clave}</th>`
+              if(id == 2){
+              }else{html+=`<th>${clave.clave}</th>`}
           })
             html+= `</thead></tr>`
         }else{
             html+= `<tbody><tr>`
             element.filanueva.forEach((clave, id) => {
-                  html+=`<td>${clave.clave}</td>`
+                  if(id == 2){
+                  }else{
+                    if(id == 3){
+                      console.log("Tabla número " + idTabla)
+                      console.log("Fila número " + index)
+                      console.log(threshold[index-1])
+                      console.log(element.filanueva[3].clave)
+                      html+=`<td>${ element.filanueva[3].clave > threshold[index-1] ? ">" + clave.clave : clave.clave}</td>`
+                    }else{
+                      html+=`<td>${clave.clave}</td>`
+                    }
+                  }
             })
               html+= `</tbody></tr>`
         }
@@ -200,14 +213,16 @@ function montarTabla(json, idTabla){
       case "table4":
         if(index == 0){
           html+= `<thead><tr>`
-          element.filanueva.forEach((clave) => {
-            html+=`<th>${clave.clave}</th>`
+          element.filanueva.forEach((clave, id) => {
+            if(id == 2){
+            }else{html+=`<th>${clave.clave}</th>`}
           })
           html+= `</thead></tr>`
         }else{
             html+= `<tbody><tr>`
-            element.filanueva.forEach((clave) => {
-              html+=`<td>${typeof clave.clave == "number" ? clave.clave * 100 + "%" : clave.clave}</td>`
+            element.filanueva.forEach((clave, id) => {
+              if(id == 2){
+              }else{html+=`<td>${typeof clave.clave == "number" ? clave.clave * 100 + "%" : clave.clave}</td>`}
             })
             html+= `</tbody></tr>`
         }
@@ -404,19 +419,19 @@ function createDefaultColumnChart(data, id){
       categoryXField: "CODE"
     }));
     
-      series.columns.template.setAll({
-        tooltipText: "{name}, {categoryX}: {valueY} %",
-        width: am5.percent(70),
-        tooltipY: 0,
-        strokeOpacity: 0
-      });
-    
 
+    series.columns.template.setAll({
+      tooltipText: "{name}, {categoryX}: {valueY} %",
+      width: am5.percent(70),
+      tooltipY: 0,
+      strokeOpacity: 0
+    });
 
     series.data.setAll(data);
     series.appear();
     legend.data.push(series);
   }
+
   if(id == 4){
     makeSeries("1º Period", "PERIOD1");
     makeSeries("2º Period", "PERIOD2");
@@ -424,7 +439,6 @@ function createDefaultColumnChart(data, id){
   }else{
     makeSeries("Total Amount", "TOTALAMOUNT");
   }
-
 
   chart.appear(1000, 100);
 
