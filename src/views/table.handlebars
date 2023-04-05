@@ -197,11 +197,7 @@ function montarTabla(json, indexGlobal){
                   if(id == 2){
                   }else{
                     if(id == 3){
-                      console.log("Tabla número " + idTabla)
-                      console.log("Fila número " + index)
-                      console.log(threshold[index-1])
-                      console.log(element.filanueva[3].clave)
-                      html+=`<td>${ element.filanueva[3].clave > threshold[index-1] ? ">" + clave.clave : clave.clave}</td>`
+                      html+=`<td>${ element.filanueva[3].clave - threshold[index-1] >= 500 ? ">" + threshold[index-1] : clave.clave}</td>`
                     }else{
                       html+=`<td>${clave.clave}</td>`
                     }

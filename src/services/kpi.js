@@ -40,14 +40,13 @@ export default function datosTabla(){
                 }else{
                     valor = worksheet[`${letras[index]}${j}`].v
                 }
-                
                 jsonAux.filanueva.push({"clave": valor})
             }
             jsonSheet.sheet.push(jsonAux)
         }
         json.sheets.push(jsonSheet)
     }
-
+    
     return json
 }
 
