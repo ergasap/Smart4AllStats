@@ -1,9 +1,15 @@
 {
-  "type": "module",
+  "name": "kb-cluster-landing-page",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
+  "author": "",
+  "type": "module",
+  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "d3": "^7.7.0",
