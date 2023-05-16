@@ -1,5 +1,5 @@
 
-FROM node:lts-bullseye
+FROM node:latest
 
 WORKDIR /usr/src/app
 
