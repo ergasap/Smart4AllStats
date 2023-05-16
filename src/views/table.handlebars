@@ -218,7 +218,7 @@ function montarTabla(json, indexGlobal){
             html+= `<tbody><tr>`
             element.filanueva.forEach((clave, id) => {
               if(id == 2){
-              }else{html+=`<td>${typeof clave.clave == "number" ? clave.clave * 100 + "%" : clave.clave}</td>`}
+              }else{html+=`<td>${typeof clave.clave == "number" ? Math.round(clave.clave * 100) + "%" : clave.clave}</td>`}
             })
             html+= `</tbody></tr>`
         }
