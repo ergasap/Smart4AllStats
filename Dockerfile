@@ -1,5 +1,4 @@
-
-FROM node:latest
+FROM node:lts-bullseye
 
 WORKDIR /usr/src/app
 
